@@ -7,7 +7,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 
-class Table(QDialog):
+class Table(QWidget):
 
     column_headers = (
         'Hs', 'Tp', 'Gamma', 'Heading', 'Curr. vel.', 'Curr. Dir.',
@@ -50,7 +50,7 @@ class Table(QDialog):
     def keyPressEvent(self, event):
         """Override key press event handler to add the following features:
             - Past table-like data from clipboard
-            - Delete data
+            - Delete data using supp. key
         """
 
         selected = self.table.selectedRanges()
@@ -79,56 +79,54 @@ class Table(QDialog):
                         first_col + c,
                         QTableWidgetItem(col)
                         )
-
             return
 
         # Enable deleting multiple cells using 'suppr' key
         if event.key() == Qt.Key_Delete:
 
+            # Figure out boudaries of the selected data to delete
             first_row = selected[0].topRow()
             last_row = selected[0].bottomRow()
             first_col = selected[0].leftColumn()
             last_col = selected[0].rightColumn()
 
+            # Set null value ('') in each cells of the selected range
             for r in range(first_row, last_row + 1, 1):
                 for c in range(first_col, last_col + 1, 1):
                     self.table.setItem(r, c, QTableWidgetItem(''))
-
             return
 
-
     def update_rows(self, nrows):
-        """Append or remove rows to the table"""
-
-        # remove last rows
+        """Append or remove rows to the table based on a given number of
+        rows.
+        """
         while self.table.rowCount() != nrows:
-
             # Remove last row
             if self.table.rowCount() > nrows:
                 self.table.removeRow(self.table.rowCount() - 1)
-
             # Append new row
             elif self.table.rowCount() < nrows:
                 self.table.insertRow(self.table.rowCount())
 
-        #self.table.resizeColumnsToContents()
-
     def get_values(self):
+        """Return values of the table as dictionnary. Empty cells are
+        considered as NaN values.
+        """
 
         _values = {}
-        try:
-            for j in range(self.table.columnCount()):
-                rowvals = []
-                for i in range(self.table.rowCount()):
-                    cell = self.table.item(i, j)
-                    if cell:
-                        rowvals.append((i, float(cell.text())))
-                    else:
-                        rowvals.append((i, float('nan')))
-                _values[self.column_headers[j]] = dict(rowvals)
 
-        except ValueError as e:
-            raise ValueError('Table content must be numbers only')
+        for j in range(self.table.columnCount()):
+            rowvals = []
+            for i in range(self.table.rowCount()):
+                cell = self.table.item(i, j)
+                if cell:
+                    try:
+                        rowvals.append((i, float(cell.text())))
+                    except ValueError as e:
+                        raise ValueError('Table content must be numbers only')
+                else:
+                    rowvals.append((i, float('nan')))
+                _values[self.column_headers[j]] = dict(rowvals)
 
         return _values
 

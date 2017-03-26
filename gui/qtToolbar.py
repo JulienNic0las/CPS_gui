@@ -3,10 +3,18 @@
     Demo of a toolbar
 """
 import sys
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+import os
+try:
+    from PyQt4.QtCore import *
+    from PyQt4.QtGui import *
+except:
+    from PyQt5.QtCore import *
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
 from functools import partial
+
+ICONS_PATH = os.path.join(os.getcwd(), 'icons')
+print(ICONS_PATH)
 
 class MyWidget(QWidget):
 
@@ -60,16 +68,16 @@ class ToolBarDemo(QMainWindow):
         # actions checkable, one at a time
         action_group = QActionGroup(self)
 
-        action = QAction(QIcon('home.png'), 'Dummy', action_group)
+        action = QAction(QIcon(ICONS_PATH + '/' + 'home.png'), 'Dummy', action_group)
         action.objectName = 't'
         action.triggered.connect(partial(self.switch_widget, 0))
         toolbar.addAction(action)
 
-        action = QAction(QIcon('home.png'), 'Dummy', action_group)
+        action = QAction(QIcon(ICONS_PATH + '/' + 'home.png'), 'Dummy', action_group)
         action.triggered.connect(partial(self.switch_widget, 1))
         toolbar.addAction(action)
 
-        action = QAction(QIcon('home.png'), 'Dummy', action_group)
+        action = QAction(QIcon(ICONS_PATH + '/' + 'settings_24.png'), 'Settings', action_group)
         action.triggered.connect(partial(self.switch_widget, 2))
         toolbar.addAction(action)
 
@@ -112,11 +120,11 @@ class ToolBarDemo(QMainWindow):
         toolbar.setFloatable(False)
         self.addToolBar(toolbar)
 
-        action = QAction(QIcon('run.png'), 'run', self)
+        action = QAction(QIcon(ICONS_PATH + '/' + 'ic_play_arrow_24px.png'), 'run', self)
         action.triggered.connect(self.cbk_run)
         toolbar.addAction(action)
 
-        action = QAction(QIcon('stop.png'), 'stop', self)
+        action = QAction(QIcon(ICONS_PATH + '/' + 'stop.png'), 'stop', self)
         action.triggered.connect(self.cbk_stop)
         toolbar.addAction(action)
 
